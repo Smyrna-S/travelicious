@@ -3,11 +3,18 @@ import { Pressable, StyleSheet } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import { getRecommendation } from '@/data/recommendationEngine';
 
 const categories = ['Nature', 'Culture & Heritage', 'Food', 'Adventure'];
 
 export default function DiscoverScreen() {
   const router = useRouter();
+
+  const handlePick = (category: string) => {
+    const gem = getRecommendation(category, []); // empty array = no visited history yet
+    if (!gem) return;
+    router.push({ pathname: '/hidden-gem', params: { id: gem.id } });
+  };
 
   return (
     <ThemedView style={styles.container}>
@@ -17,7 +24,7 @@ export default function DiscoverScreen() {
       </ThemedText>
 
       {categories.map((cat) => (
-        <Pressable key={cat} style={styles.pill} onPress={() => alert(cat)}>
+        <Pressable key={cat} style={styles.pill} onPress={() => handlePick(cat)}>
           <ThemedText style={styles.pillText}>{cat}</ThemedText>
         </Pressable>
       ))}
@@ -26,16 +33,8 @@ export default function DiscoverScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 24,
-    paddingTop: 60,
-  },
-  subtitle: {
-    marginTop: 6,
-    marginBottom: 24,
-    opacity: 0.7,
-  },
+  container: { flex: 1, padding: 24, paddingTop: 60 },
+  subtitle: { marginTop: 6, marginBottom: 24, opacity: 0.7 },
   pill: {
     backgroundColor: '#FDF6E8',
     borderWidth: 1,
@@ -44,8 +43,5 @@ const styles = StyleSheet.create({
     padding: 16,
     marginBottom: 12,
   },
-  pillText: {
-    fontWeight: '600',
-    color: '#2B1B12',
-  },
+  pillText: { fontWeight: '600', color: '#2B1B12' },
 });
