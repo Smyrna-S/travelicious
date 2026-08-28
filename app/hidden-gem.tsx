@@ -52,7 +52,7 @@ export default function HiddenGemScreen() {
 
       <Pressable
         style={styles.button}
-        onPress={() => alert('Mission complete! (Mission Complete screen coming in the next step)')}
+        onPress={() => router.push({ pathname: '/mission-complete', params: { id: gem.id } })}
       >
         <ThemedText style={styles.buttonText}>COMPLETE MISSION</ThemedText>
       </Pressable>
