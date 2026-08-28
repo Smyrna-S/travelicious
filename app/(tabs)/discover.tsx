@@ -1,3 +1,4 @@
+import { getJourney } from '@/data/journeyStore';
 import { useRouter } from 'expo-router';
 import { Pressable, StyleSheet } from 'react-native';
 
@@ -10,11 +11,13 @@ const categories = ['Nature', 'Culture & Heritage', 'Food', 'Adventure'];
 export default function DiscoverScreen() {
   const router = useRouter();
 
-  const handlePick = (category: string) => {
-    const gem = getRecommendation(category, []); // empty array = no visited history yet
-    if (!gem) return;
-    router.push({ pathname: '/hidden-gem', params: { id: gem.id } });
-  };
+const handlePick = async (category: string) => {
+  const journey = await getJourney();
+  const visitedIds = journey.map((j) => j.id);
+  const gem = getRecommendation(category, visitedIds);
+  if (!gem) return;
+  router.push({ pathname: '/hidden-gem', params: { id: gem.id } });
+};
 
   return (
     <ThemedView style={styles.container}>

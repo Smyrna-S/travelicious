@@ -1,4 +1,6 @@
+import { addJourneyEntry } from '@/data/journeyStore';
 import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useEffect } from 'react';
 import { Pressable, StyleSheet } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
@@ -9,6 +11,11 @@ export default function MissionCompleteScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const gem = DESTINATIONS.find((d) => d.id === id);
+  useEffect(() => {
+  if (gem) {
+    addJourneyEntry(gem);
+  }
+}, [gem]);
 
   return (
     <ThemedView style={styles.container}>
@@ -29,7 +36,7 @@ export default function MissionCompleteScreen() {
 
       <Pressable
         style={styles.linkButton}
-        onPress={() => alert('My Journey screen coming in the next step!')}
+        onPress={() => router.push('/journey')}
       >
         <ThemedText style={styles.linkButtonText}>View my journey</ThemedText>
       </Pressable>
