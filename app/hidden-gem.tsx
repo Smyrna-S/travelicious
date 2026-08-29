@@ -1,5 +1,7 @@
+import * as ImagePicker from 'expo-image-picker';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { useState } from 'react';
+import { Image, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
@@ -16,6 +18,7 @@ export default function HiddenGemScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const gem = DESTINATIONS.find((d) => d.id === id);
+  const [photoUri, setPhotoUri] = useState<string | null>(null);
 
   if (!gem) {
     return (
@@ -25,8 +28,27 @@ export default function HiddenGemScreen() {
     );
   }
 
-  return (
-    <ThemedView style={styles.container}>
+  const takePhoto = async () => {
+    const permission = await ImagePicker.requestCameraPermissionsAsync();
+    if (!permission.granted) {
+      alert('Camera access is needed to complete your mission proof.');
+      return;
+    }
+    const result = await ImagePicker.launchCameraAsync({ quality: 0.6 });
+    if (!result.canceled) {
+      setPhotoUri(result.assets[0].uri);
+    }
+  };
+
+  const completeMission = () => {
+    router.push({
+      pathname: '/mission-complete',
+      params: { id: gem.id, photoUri: photoUri ?? '' },
+    });
+  };
+
+ return (
+  <ScrollView contentContainerStyle={styles.container}>
       <ThemedText type="title" style={styles.heading}>We found something for you…</ThemedText>
       <ThemedText style={styles.subheading}>A little off the beaten path.</ThemedText>
 
@@ -50,18 +72,33 @@ export default function HiddenGemScreen() {
         <ThemedText style={styles.coinText}>🪙 +{gem.coins} Travel Coins</ThemedText>
       </View>
 
+      <ThemedText style={styles.sectionLabel}>Proof of your visit</ThemedText>
+      {photoUri ? (
+        <Image source={{ uri: photoUri }} style={styles.photoPreview} />
+      ) : (
+        <Pressable style={styles.photoSlot} onPress={takePhoto}>
+          <ThemedText style={styles.photoSlotText}>📷 Take a photo to complete your mission</ThemedText>
+        </Pressable>
+      )}
+      {photoUri && (
+        <Pressable onPress={takePhoto}>
+          <ThemedText style={styles.retakeText}>Retake photo</ThemedText>
+        </Pressable>
+      )}
+
       <Pressable
-        style={styles.button}
-        onPress={() => router.push({ pathname: '/mission-complete', params: { id: gem.id } })}
+        style={[styles.button, !photoUri && styles.buttonDisabled]}
+        onPress={completeMission}
+        disabled={!photoUri}
       >
         <ThemedText style={styles.buttonText}>COMPLETE MISSION</ThemedText>
-      </Pressable>
-    </ThemedView>
-  );
+          </Pressable>
+  </ScrollView>
+);
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 24, paddingTop: 60 },
+  container: { padding: 24, paddingTop: 60, paddingBottom: 40 },
   heading: { fontSize: 20 },
   subheading: { opacity: 0.7, marginTop: 4, marginBottom: 18 },
   imageBlock: {
@@ -81,22 +118,36 @@ const styles = StyleSheet.create({
   categoryTagText: { color: '#fff', fontSize: 12, fontWeight: '600' },
   destinationName: { fontSize: 22 },
   district: { opacity: 0.7, marginTop: 2, marginBottom: 16 },
-  sectionLabel: { fontWeight: '700', marginBottom: 4 },
+  sectionLabel: { fontWeight: '700', marginBottom: 4, marginTop: 4 },
   body: { lineHeight: 21, opacity: 0.85, marginBottom: 16 },
   missionCard: {
     backgroundColor: '#8F3B22',
     borderRadius: 14,
     padding: 16,
-    marginBottom: 20,
+    marginBottom: 8,
   },
   missionLabel: { color: '#fff', fontWeight: '800', fontSize: 12, marginBottom: 6 },
   missionText: { color: '#fff', lineHeight: 20, marginBottom: 10 },
   coinText: { color: '#fff', fontWeight: '800' },
+  photoSlot: {
+    borderWidth: 1.5,
+    borderColor: '#C1512F',
+    borderStyle: 'dashed',
+    borderRadius: 12,
+    padding: 24,
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  photoSlotText: { color: '#C1512F', fontWeight: '600', textAlign: 'center' },
+  photoPreview: { width: '100%', height: 180, borderRadius: 12, marginBottom: 4 },
+  retakeText: { color: '#C1512F', fontWeight: '600', textAlign: 'center', marginBottom: 16 },
   button: {
     backgroundColor: '#C1512F',
     borderRadius: 10,
     paddingVertical: 14,
     alignItems: 'center',
+    marginTop: 12,
   },
+  buttonDisabled: { opacity: 0.4 },
   buttonText: { color: '#fff', fontWeight: '800' },
 });

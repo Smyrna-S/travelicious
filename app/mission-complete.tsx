@@ -8,14 +8,14 @@ import { ThemedView } from '@/components/themed-view';
 import { DESTINATIONS } from '@/data/destinations';
 
 export default function MissionCompleteScreen() {
-  const { id } = useLocalSearchParams<{ id: string }>();
+  const { id, photoUri } = useLocalSearchParams<{ id: string; photoUri?: string }>();
   const router = useRouter();
   const gem = DESTINATIONS.find((d) => d.id === id);
   useEffect(() => {
   if (gem) {
-    addJourneyEntry(gem);
+    addJourneyEntry(gem, photoUri || undefined);
   }
-}, [gem]);
+  }, [gem]);
 
   return (
     <ThemedView style={styles.container}>

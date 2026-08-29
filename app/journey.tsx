@@ -1,6 +1,6 @@
 import { useFocusEffect, useRouter } from 'expo-router';
 import { useCallback, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet } from 'react-native';
+import { Image, Pressable, ScrollView, StyleSheet } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
@@ -43,6 +43,7 @@ export default function JourneyScreen() {
               <ThemedText style={styles.rowSub}>{j.district} · {j.category}</ThemedText>
             </ThemedView>
             <ThemedText style={styles.rowCoins}>+{j.coins} Coins</ThemedText>
+            {j.photoUri ? <Image source={{ uri: j.photoUri }} style={styles.thumb} /> : null}
           </ThemedView>
         ))}
       </ScrollView>
@@ -96,6 +97,7 @@ const styles = StyleSheet.create({
   rowName: { fontWeight: '700', color: '#2B1B12' },
   rowSub: { opacity: 0.6, fontSize: 12, marginTop: 2, color: '#2B1B12' },
   rowCoins: { fontWeight: '700', color: '#8F3B22', fontSize: 12 },
+  thumb: { width: 44, height: 44, borderRadius: 8, marginLeft: 10 },
   primaryButton: {
     backgroundColor: '#C1512F',
     borderRadius: 10,

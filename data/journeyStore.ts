@@ -9,6 +9,7 @@ export type JourneyEntry = {
   district: string;
   category: string;
   coins: number;
+  photoUri?: string;
 };
 
 export async function getJourney(): Promise<JourneyEntry[]> {
@@ -20,7 +21,7 @@ export async function getJourney(): Promise<JourneyEntry[]> {
   }
 }
 
-export async function addJourneyEntry(gem: Destination): Promise<void> {
+export async function addJourneyEntry(gem: Destination, photoUri?: string): Promise<void> {
   const current = await getJourney();
   const entry: JourneyEntry = {
     id: gem.id,
@@ -28,6 +29,7 @@ export async function addJourneyEntry(gem: Destination): Promise<void> {
     district: gem.district,
     category: gem.category,
     coins: gem.coins,
+    photoUri,
   };
   await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify([...current, entry]));
 }
