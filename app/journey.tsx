@@ -1,3 +1,4 @@
+import { BADGES } from '@/data/badges';
 import { DESTINATIONS } from '@/data/destinations';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { useCallback, useState } from 'react';
@@ -21,6 +22,7 @@ export default function JourneyScreen() {
   const level = 1 + Math.floor(journey.length / 3);
   const uniqueVisited = new Set(journey.map((j) => j.id)).size;
   const percentExplored = Math.round((uniqueVisited / DESTINATIONS.length) * 100);
+  const unlockedIds = new Set(BADGES.filter((b) => b.isUnlocked(journey)).map((b) => b.id));
 
   return (
     <ThemedView style={styles.container}>
@@ -42,6 +44,20 @@ export default function JourneyScreen() {
   <ThemedView style={styles.progressTrack}>
     <ThemedView style={[styles.progressFill, { width: `${percentExplored}%` }]} />
   </ThemedView>
+</ThemedView>
+<ThemedView style={styles.badgesSection}>
+  <ThemedText style={styles.progressLabel}>Badges</ThemedText>
+  <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.badgeRow}>
+    {BADGES.map((badge) => {
+      const unlocked = unlockedIds.has(badge.id);
+      return (
+        <ThemedView key={badge.id} style={[styles.badge, !unlocked && styles.badgeLocked]}>
+          <ThemedText style={styles.badgeEmoji}>{badge.emoji}</ThemedText>
+          <ThemedText style={styles.badgeName}>{badge.name}</ThemedText>
+        </ThemedView>
+      );
+    })}
+  </ScrollView>
 </ThemedView>
       <ScrollView style={styles.list}>
         {journey.length === 0 && (
@@ -89,6 +105,22 @@ const styles = StyleSheet.create({
     paddingHorizontal: 18,
     borderRadius: 20,
   },
+  badgesSection: { marginBottom: 20 },
+badgeRow: { flexDirection: 'row' },
+badge: {
+  alignItems: 'center',
+  backgroundColor: '#FDF6E8',
+  borderWidth: 1,
+  borderColor: '#C1512F',
+  borderRadius: 12,
+  paddingVertical: 10,
+  paddingHorizontal: 12,
+  marginRight: 10,
+  width: 84,
+},
+badgeLocked: { opacity: 0.3, borderColor: 'rgba(43,27,18,0.2)' },
+badgeEmoji: { fontSize: 22, marginBottom: 4 },
+badgeName: { fontSize: 10, fontWeight: '700', textAlign: 'center', color: '#2B1B12' },
   coinBadgeText: { color: '#fff', fontWeight: '800', fontSize: 13 },
   statsLine: { textAlign: 'center', opacity: 0.7, fontSize: 12, marginTop: 12, marginBottom: 16 },
   list: { flex: 1 },
