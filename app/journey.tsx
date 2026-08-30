@@ -1,3 +1,4 @@
+import { DESTINATIONS } from '@/data/destinations';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { useCallback, useState } from 'react';
 import { Image, Pressable, ScrollView, StyleSheet } from 'react-native';
@@ -18,6 +19,8 @@ export default function JourneyScreen() {
 
   const totalCoins = journey.reduce((sum, j) => sum + j.coins, 0);
   const level = 1 + Math.floor(journey.length / 3);
+  const uniqueVisited = new Set(journey.map((j) => j.id)).size;
+  const percentExplored = Math.round((uniqueVisited / DESTINATIONS.length) * 100);
 
   return (
     <ThemedView style={styles.container}>
@@ -31,7 +34,15 @@ export default function JourneyScreen() {
       <ThemedText style={styles.statsLine}>
         📍 {journey.length} Adventures   🏆 Explorer Level {level}
       </ThemedText>
-
+      <ThemedView style={styles.progressSection}>
+  <ThemedView style={styles.progressLabelRow}>
+    <ThemedText style={styles.progressLabel}>Tamil Nadu explored</ThemedText>
+    <ThemedText style={styles.progressPercent}>{percentExplored}%</ThemedText>
+  </ThemedView>
+  <ThemedView style={styles.progressTrack}>
+    <ThemedView style={[styles.progressFill, { width: `${percentExplored}%` }]} />
+  </ThemedView>
+</ThemedView>
       <ScrollView style={styles.list}>
         {journey.length === 0 && (
           <ThemedText style={styles.empty}>No adventures yet — go find your first hidden gem.</ThemedText>
@@ -108,4 +119,24 @@ const styles = StyleSheet.create({
   primaryButtonText: { color: '#fff', fontWeight: '800' },
   resetButton: { alignItems: 'center', padding: 8 },
   resetButtonText: { opacity: 0.5, fontSize: 12 },
+  progressSection: { marginBottom: 20 },
+progressLabelRow: {
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  marginBottom: 6,
+  backgroundColor: 'transparent',
+},
+progressLabel: { fontSize: 12, fontWeight: '700', opacity: 0.8 },
+progressPercent: { fontSize: 12, fontWeight: '800', color: '#C1512F' },
+progressTrack: {
+  height: 10,
+  borderRadius: 6,
+  backgroundColor: 'rgba(43,27,18,0.1)',
+  overflow: 'hidden',
+},
+progressFill: {
+  height: '100%',
+  backgroundColor: '#C1512F',
+  borderRadius: 6,
+},
 });
